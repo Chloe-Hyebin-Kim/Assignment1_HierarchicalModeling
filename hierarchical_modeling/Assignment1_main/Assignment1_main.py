@@ -4,6 +4,7 @@ import pyglet
 from pyglet.gl import Config
 from OpenGL.GL import *
 
+time_value = 0.0
 
 # ------------------------------------------------------------
 # Window / OpenGL Context
@@ -65,6 +66,7 @@ def align_y_axis_to_vector(dx, dy, dz):
     #(0, 1, 0) == 처음 생성되는 local y축 방향
     # y 외젓 v
     #원기둥의 기본 방향인 y축을 실제 링크 방향으로 맞추기 위한 회전축 계산
+    #(0,1,0)과 목표 방향 외적
     axis_x = vz
     axis_y = 0.0
     axis_z = -vx
@@ -127,6 +129,51 @@ def draw_cylinder_y(radius, height, color, segments=40):
         glVertex3f(math.cos(a) * radius, height, math.sin(a) * radius)
     glEnd()
 
+def draw_box_y(width, height, depth, color):
+    set_color(color)
+
+    x = width / 2.0
+    z = depth / 2.0
+
+    glBegin(GL_QUADS)
+
+    # front face
+    glVertex3f(-x, 0.0, z)
+    glVertex3f(x, 0.0, z)
+    glVertex3f(x, height, z)
+    glVertex3f(-x, height, z)
+
+    # back face
+    glVertex3f(x, 0.0, -z)
+    glVertex3f(-x, 0.0, -z)
+    glVertex3f(-x, height, -z)
+    glVertex3f(x, height, -z)
+
+    # left face
+    glVertex3f(-x, 0.0, -z)
+    glVertex3f(-x, 0.0, z)
+    glVertex3f(-x, height, z)
+    glVertex3f(-x, height, -z)
+
+    # right face
+    glVertex3f(x, 0.0, z)
+    glVertex3f(x, 0.0, -z)
+    glVertex3f(x, height, -z)
+    glVertex3f(x, height, z)
+
+    # bottom face
+    glVertex3f(-x, 0.0, -z)
+    glVertex3f(x, 0.0, -z)
+    glVertex3f(x, 0.0, z)
+    glVertex3f(-x, 0.0, z)
+
+    # top face
+    glVertex3f(-x, height, z)
+    glVertex3f(x, height, z)
+    glVertex3f(x, height, -z)
+    glVertex3f(-x, height, -z)
+
+    glEnd()
 
 def draw_cylinder_between(start, end, radius, color, segments=40):
     sx, sy, sz = start
@@ -252,69 +299,125 @@ def draw_floor_grid():
 # Hierarchical stand lamp
 ###
 def draw_stand_lamp():
-    # 바닥 위 원기둥 받침대
-    base_radius = 0.65
+    global time_value
+
+    #움직일 각도
+    base_yaw_angle = math.sin(time_value * 0.8) * 35.0
+    lower_arm_angle = -55.0 + math.sin(time_value * 1.2) * 20.0
+    lamp_head_angle = -95.0 + math.sin(time_value * 1.8) * 18.0
+    
+    neck_length = 0.85
+    lower_arm_length = 1.85
+    lamp_head_length = 0.75
+
+    # 바닥 위 사각기둥 받침대
+    base_width = 1.2
+    base_depth = 1.2
     base_height = 0.25
 
     glPushMatrix()
-    draw_cylinder_y(
-        radius=base_radius,
+
+    draw_box_y(
+        width=base_width,
         height=base_height,
+        depth=base_depth,
         color=(0.30, 0.30, 0.30)
     )
-    glPopMatrix()
-
-    base_top = (0.0, base_height, 0.0)
 
     # 베이스 상단 연결부
+    #base_top = (0.0, base_height, 0.0)
+    #glPopMatrix()
+    glTranslatef(0.0, base_height, 0.0) 
     draw_sphere(
-        center=base_top,
+       #center=base_top,
+        center=(0.0, 0.0, 0.0),
         radius=0.10,
         color=(0.85, 0.85, 0.85)
     )
 
+    # Base 회전
+    glRotatef(base_yaw_angle, 0.0, 1.0, 0.0)
+
+
+
     # 꺾인 목
-    neck_end = (0.0, 1.10, 0.0)
-    arm_end = (1.85, 2.25, 0.0)
+    #neck_end = (0.0, 1.10, 0.0)
+    #arm_end = (1.85, 2.25, 0.0)
 
-    draw_cylinder_between(
-        start=base_top,
-        end=neck_end,
+    # 수직 목 부분
+    draw_cylinder_y(
         radius=0.07,
+        height=neck_length,
         color=(0.20, 0.55, 0.90)
     )
+    #draw_cylinder_between(
+    #    start=base_top,
+    #    end=neck_end,
+    #    radius=0.07,
+    #    color=(0.20, 0.55, 0.90)
+    #)
+
+    # 목 끝 관절로 이동
+    glTranslatef(0.0, neck_length, 0.0)
+
 
     draw_sphere(
-        center=neck_end,
+        #center=neck_end,
+        center=(0.0, 0.0, 0.0),
         radius=0.12,
         color=(0.85, 0.85, 0.85)
     )
 
-    draw_cylinder_between(
-        start=neck_end,
-        end=arm_end,
+    # Lower Arm 회전
+    glRotatef(lower_arm_angle, 0.0, 0.0, 1.0)
+
+    # 꺾인 목
+    draw_cylinder_y(
         radius=0.07,
+        height=lower_arm_length,
         color=(0.20, 0.55, 0.90)
     )
+    #draw_cylinder_between(
+    #    start=neck_end,
+    #    end=arm_end,
+    #    radius=0.07,
+    #    color=(0.20, 0.55, 0.90)
+    #)
+     
+    # 팔 끝 관절로 이동
+    glTranslatef(0.0, lower_arm_length, 0.0)
 
     draw_sphere(
-        center=arm_end,
+        #center=arm_end,
+        center=(0.0, 0.0, 0.0),
         radius=0.12,
         color=(0.85, 0.85, 0.85)
     )
 
-    # 조명
-    head_end = (2.30, 1.45, 0.0)
 
-    draw_frustum_between(
-        start=arm_end,
-        end=head_end,
-        radius_start=0.18,
-        radius_end=0.48,
+    # Lamp Head 회전
+    glRotatef(lamp_head_angle, 0.0, 0.0, 1.0)
+
+     # 조명 갓
+    draw_frustum_y(
+        radius_bottom=0.18,
+        radius_top=0.48,
+        height=lamp_head_length,
         color=(0.95, 0.80, 0.25)
     )
+    # 조명
+    #head_end = (2.30, 1.45, 0.0)
 
-    
+    #draw_frustum_between(
+    #   start=arm_end,
+    #    end=head_end,
+    #   radius_start=0.18,
+    #    radius_end=0.48,
+    #    color=(0.95, 0.80, 0.25)
+    #)
+
+    glPopMatrix()
+
 
 
 # ------------------------------------------------------------
@@ -364,7 +467,15 @@ def on_draw():
 # OpenGL state
 # ------------------------------------------------------------
 
+
+#tick
+def update(dt):
+    global time_value
+    time_value += dt
+
 glClearColor(0.06, 0.07, 0.09, 1.0)
 glEnable(GL_DEPTH_TEST)
+
+pyglet.clock.schedule_interval(update, 1 / 60)
 
 pyglet.app.run()
