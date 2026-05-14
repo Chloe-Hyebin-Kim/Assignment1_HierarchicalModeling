@@ -302,9 +302,21 @@ def draw_stand_lamp():
     global time_value
 
     #움직일 각도
-    base_yaw_angle = math.sin(time_value * 0.8) * 35.0
-    lower_arm_angle = -55.0 + math.sin(time_value * 1.2) * 20.0
-    lamp_head_angle = -95.0 + math.sin(time_value * 1.8) * 18.0
+    #base_yaw_angle = math.sin(time_value * 0.8) * 35.0
+    #lower_arm_angle = -55.0 + math.sin(time_value * 1.2) * 20.0
+    #lamp_head_angle = -95.0 + math.sin(time_value * 1.8) * 18.0
+
+    #딱딱하게 움직이도록 키프레임 방식으로 변경
+    hold_time = 0.65
+    step = int(time_value / hold_time) % 4
+
+    base_yaw_keyframes = [-35.0, -10.0, 20.0, 35.0]
+    lower_arm_keyframes = [-75.0, -55.0, -35.0, -55.0]
+    lamp_head_keyframes = [-115.0, -95.0, -75.0, -95.0]
+    
+    base_yaw_angle = base_yaw_keyframes[step]
+    lower_arm_angle = lower_arm_keyframes[step]
+    lamp_head_angle = lamp_head_keyframes[step]
     
     neck_length = 0.85
     lower_arm_length = 1.85
