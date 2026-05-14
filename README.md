@@ -3,6 +3,8 @@ https://stormy-airbus-32f.notion.site/Assignment-1-Hierarchical-Modeling-17f690c
 
 
 FK anim 구현.
+![전등](hierarchical_modeling/Assignment1_main/Assignment1_HierarchicalModel-3D-Stand-Lamp-2026-05-14-23-58-22.gif)
+
 
 ## 실행 환경
 
