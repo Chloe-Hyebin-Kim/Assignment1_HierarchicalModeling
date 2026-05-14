@@ -13,11 +13,13 @@ FK anim 구현.
 
 ## 문서 구조
 ```
-hierarchical_modeling/
-├── .venv/
-├── Assignment1_main/
-│ └── Assignment1_main.py # 메인 실행 스크립트
-└── Assignment1_main.slnx # 솔루션 구성 파일
+Assignment1_HierarchicalModeling
+└── hierarchical_modeling/
+│   ├── .venv/ 
+│   ├── Assignment1_main/
+│   │   └── Assignment1_main.py # 메인 실행 스크립트
+│   │   └── Assignment1_HierarchicalModel-3D-Stand-Lamp-2026-05-14-23-58-22.gif  # 영상
+│   └── Assignment1_main.slnx # 솔루션 구성 파일
 ```
 
 
